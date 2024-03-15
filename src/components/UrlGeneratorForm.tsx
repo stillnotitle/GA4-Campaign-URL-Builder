@@ -92,7 +92,7 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
     <Box component="form" mb={4} onSubmit={handleSubmit}>
       <Box display="flex" alignItems="center">
         <FormLabel component="legend">ウェブサイトのURL*</FormLabel>
-        <Tooltip title="ウェブサイトのURLを入力してください。">
+        <Tooltip title="計測を実施するウェブサイトのURLを入力してください。">
           <IconButton>
             <HelpIcon />
           </IconButton>
@@ -106,7 +106,6 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
           margin="normal"
           value={formValues.websiteUrl}
           onChange={(e) => handleChange('websiteUrl', e.target.value)}
-          helperText="計測を実施するウェブサイトのURLを入力してください。"
           error={!!validationErrors.websiteUrl}
           helperText={validationErrors.websiteUrl}
         />
@@ -148,7 +147,7 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
             margin="normal"
             value={formValues.sourceOther}
             onChange={(e) => handleChange('sourceOther', e.target.value)}
-            placeholder="配信元を入力"
+            placeholder="配信元を入力（英数小文字）"
             error={!!validationErrors.sourceOther}
             helperText={validationErrors.sourceOther}
           />
@@ -189,7 +188,7 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
             margin="normal"
             value={formValues.mediumOther}
             onChange={(e) => handleChange('mediumOther', e.target.value)}
-            placeholder="メディア種別を入力"
+            placeholder="メディア種別を入力（英数小文字）"
             error={!!validationErrors.mediumOther}
             helperText={validationErrors.mediumOther}
           />
@@ -197,7 +196,7 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
       </FormControl>
       <Box display="flex" alignItems="center">
         <FormLabel component="legend">キャンペーン名*</FormLabel>
-        <Tooltip title="キャンペーン名を作成してください。配信日の挿入もできます。">
+        <Tooltip title="キャンペーン名を作成してください。配信日の挿入もできます。利用できるのは英数小文字とアンダースコアとハイフンのみです。">
           <IconButton>
             <HelpIcon />
           </IconButton>
@@ -211,7 +210,6 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
           margin="normal"
           value={formValues.campaignName}
           onChange={(e) => handleChange('campaignName', e.target.value)}
-          helperText="キャンペーン名を入力してください。"
           error={!!validationErrors.campaignName}
           helperText={validationErrors.campaignName}
         />

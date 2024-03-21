@@ -8,72 +8,38 @@ import ja from 'date-fns/locale/ja/index.js';
 import { generateUrl } from '../utilities/urlGenerator';
 import { FormValues } from '../types';
 import { format } from 'date-fns';
+import { useForm } from '../hooks/useForm';
 
 interface UrlGeneratorFormProps {
   onSubmit: (formValues: FormValues) => void;
   validationErrors: Record<string, string>;
 }
 
-const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validationErrors }) => {
-  const [formValues, setFormValues] = useState<FormValues>({
-    websiteUrl: '',
-    source: '',
-    medium: '',
-    campaignName: '',
-    sourceOther: '',
-    mediumOther: '',
-    deliveryDate: null,
-    content: '',
-  });
-  const [generatedUrl, setGeneratedUrl] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
+const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ validationErrors }) => {
+const { formValues, errors, handleChange, handleSubmit } = useForm();
+const [generatedUrl, setGeneratedUrl] = useState('');
+const [showPreview, setShowPreview] = useState(false);
 
-  useEffect(() => {
-    const requiredFields = ['websiteUrl', 'source', 'medium', 'campaignName'];
-    const isAllRequiredFieldsFilled = requiredFields.every((field) => formValues[field as keyof FormValues]);
+useEffect(() => {
+  const requiredFields = ['websiteUrl', 'source', 'medium', 'campaignName'];
+  const isAllRequiredFieldsFilled = requiredFields.every((field) => formValues[field as keyof FormValues]);
 
-    if (isAllRequiredFieldsFilled) {
-      const url = generateUrl(formValues);
-      setGeneratedUrl(url);
-      setShowPreview(true);
-    } else {
-      setGeneratedUrl('');
-      setShowPreview(false);
-    }
-  }, [formValues]);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log('Submitting form with values:', formValues);
-    onSubmit(formValues);
-  };
-
-  const handleChange = (field: keyof FormValues, value: FormValues[keyof FormValues]) => {
-    console.log('Form field changed:', field, value);
-    setFormValues((prevValues) => {
-      if (field === 'campaignName' && prevValues.deliveryDate) {
-        return {
-          ...prevValues,
-          deliveryDate: null,
-          [field]: value,
-        };
-      }
-      return {
-        ...prevValues,
-        [field]: value,
-      };
-    });
-  };
+  if (isAllRequiredFieldsFilled) {
+    const url = generateUrl(formValues);
+    setGeneratedUrl(url);
+    setShowPreview(true);
+  } else {
+    setGeneratedUrl('');
+    setShowPreview(false);
+  }
+}, [formValues]);
 
   const handleDateChange = (newValue: Date | null) => {
     const formattedDate = newValue ? format(newValue, 'yyyyMMdd', { locale: ja }) + '_' : '';
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      deliveryDate: newValue,
-      campaignName: formattedDate,
-    }));
+    handleChange('deliveryDate', newValue);
+    handleChange('campaignName', formattedDate + formValues.campaignName.split('_').pop());
   };
-
+  
   const copyToClipboard = async () => {
     if (!navigator.clipboard) {
       console.error('Clipboard API not supported');
@@ -106,8 +72,8 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
           margin="normal"
           value={formValues.websiteUrl}
           onChange={(e) => handleChange('websiteUrl', e.target.value)}
-          error={!!validationErrors.websiteUrl}
-          helperText={validationErrors.websiteUrl}
+          error={!!errors.websiteUrl}
+          helperText={errors.websiteUrl}
         />
       </Box>
       <FormControl component="fieldset" margin="normal">
@@ -148,8 +114,8 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
             value={formValues.sourceOther}
             onChange={(e) => handleChange('sourceOther', e.target.value)}
             placeholder="配信元を入力（英数小文字）"
-            error={!!validationErrors.sourceOther}
-            helperText={validationErrors.sourceOther}
+            error={!!errors.sourceOther}
+            helperText={errors.sourceOther}
           />
         )}
       </FormControl>
@@ -189,30 +155,20 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
             value={formValues.mediumOther}
             onChange={(e) => handleChange('mediumOther', e.target.value)}
             placeholder="メディア種別を入力（英数小文字）"
-            error={!!validationErrors.mediumOther}
-            helperText={validationErrors.mediumOther}
+            error={!!errors.mediumOther}
+            helperText={errors.mediumOther}
           />
         )}
       </FormControl>
       <Box display="flex" alignItems="center">
         <FormLabel component="legend">キャンペーン名*</FormLabel>
-        <Tooltip title="キャンペーン名を作成してください。配信日の挿入もできます。利用できるのは英数小文字とアンダースコアとハイフンのみです。">
+        <Tooltip title="キャンペーン名を作成してください。配信日の挿入もできます。">
           <IconButton>
             <HelpIcon />
           </IconButton>
         </Tooltip>
       </Box>
       <Box display="flex" gap={2}>
-        <TextField
-          label="キャンペーン名を作成"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={formValues.campaignName}
-          onChange={(e) => handleChange('campaignName', e.target.value)}
-          error={!!validationErrors.campaignName}
-          helperText={validationErrors.campaignName}
-        />
         <LocalizationProvider dateAdapter={AdapterDateFns} locale={ja}>
           <DatePicker
             label="配信日から入力"
@@ -231,6 +187,16 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
             }}
           />
         </LocalizationProvider>
+        <TextField
+          label="キャンペーン名を作成"
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={formValues.campaignName}
+          onChange={(e) => handleChange('campaignName', e.target.value)}
+          error={!!errors.campaignName}
+          helperText={errors.campaignName}
+        />
       </Box>
       <Box display="flex" alignItems="center">
         <FormLabel component="legend">コンテンツ ＜オプション＞</FormLabel>
@@ -247,6 +213,8 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ onSubmit, validatio
         margin="normal"
         value={formValues.content}
         onChange={(e) => handleChange('content', e.target.value)}
+        error={!!errors.content}
+        helperText={errors.content}
       />
       <Box mb={2}>
         <Typography variant="h6" gutterBottom>

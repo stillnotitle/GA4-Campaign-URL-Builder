@@ -1,56 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import { TextField, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Box, Typography, Tooltip, IconButton, Button } from '@mui/material';
-import { CalendarToday as CalendarIcon, Help as HelpIcon, FileCopy as FileCopyIcon } from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import ja from 'date-fns/locale/ja/index.js';
-import { generateUrl } from '../utilities/urlGenerator';
-import { FormValues } from '../types';
-import { format } from 'date-fns';
-import { useForm } from '../hooks/useForm';
+import React, { useState, useEffect } from "react";
+import {
+  TextField,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Box,
+  Typography,
+  Tooltip,
+  IconButton,
+  Button,
+} from "@mui/material";
+import {
+  CalendarToday as CalendarIcon,
+  Help as HelpIcon,
+  FileCopy as FileCopyIcon,
+} from "@mui/icons-material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { ja } from "date-fns/locale";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { generateUrl } from "../utilities/urlGenerator";
+import { FormValues } from "../types";
+import { format } from "date-fns";
+import { useForm } from "../hooks/useForm";
 
 interface UrlGeneratorFormProps {
   onSubmit: (formValues: FormValues) => void;
   validationErrors: Record<string, string>;
 }
 
-const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({ validationErrors }) => {
-const { formValues, errors, handleChange, handleSubmit } = useForm();
-const [generatedUrl, setGeneratedUrl] = useState('');
-const [showPreview, setShowPreview] = useState(false);
-
-useEffect(() => {
-  const requiredFields = ['websiteUrl', 'source', 'medium', 'campaignName'];
-  const isAllRequiredFieldsFilled = requiredFields.every((field) => formValues[field as keyof FormValues]);
-
-  if (isAllRequiredFieldsFilled) {
-    const url = generateUrl(formValues);
-    setGeneratedUrl(url);
-    setShowPreview(true);
-  } else {
-    setGeneratedUrl('');
-    setShowPreview(false);
+class CustomAdapterDateFns extends AdapterDateFns {
+  constructor() {
+    super({ locale: ja });
   }
-}, [formValues]);
+}
+
+const adapterWithLocale = new AdapterDateFns({ locale: ja });
+
+const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({
+  validationErrors,
+}) => {
+  const { formValues, errors, handleChange, handleSubmit } = useForm();
+  const [generatedUrl, setGeneratedUrl] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
+
+  useEffect(() => {
+    const requiredFields = ["websiteUrl", "source", "medium", "campaignName"];
+    const isAllRequiredFieldsFilled = requiredFields.every(
+      (field) => formValues[field as keyof FormValues],
+    );
+
+    if (isAllRequiredFieldsFilled) {
+      const url = generateUrl(formValues);
+      setGeneratedUrl(url);
+      setShowPreview(true);
+    } else {
+      setGeneratedUrl("");
+      setShowPreview(false);
+    }
+  }, [formValues]);
 
   const handleDateChange = (newValue: Date | null) => {
-    const formattedDate = newValue ? format(newValue, 'yyyyMMdd', { locale: ja }) + '_' : '';
-    handleChange('deliveryDate', newValue);
-    handleChange('campaignName', formattedDate + formValues.campaignName.split('_').pop());
+    const formattedDate = newValue
+      ? format(newValue, "yyyyMMdd", { locale: ja }) + "_"
+      : "";
+    handleChange("deliveryDate", newValue);
+    handleChange(
+      "campaignName",
+      formattedDate + formValues.campaignName.split("_").pop(),
+    );
   };
-  
+
   const copyToClipboard = async () => {
     if (!navigator.clipboard) {
-      console.error('Clipboard API not supported');
+      console.error("Clipboard API not supported");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(generatedUrl);
-      console.log('URL copied to clipboard');
+      console.log("URL copied to clipboard");
     } catch (err) {
-      console.error('Failed to copy URL: ', err);
+      console.error("Failed to copy URL: ", err);
     }
   };
 
@@ -71,7 +104,7 @@ useEffect(() => {
           fullWidth
           margin="normal"
           value={formValues.websiteUrl}
-          onChange={(e) => handleChange('websiteUrl', e.target.value)}
+          onChange={(e) => handleChange("websiteUrl", e.target.value)}
           error={!!errors.websiteUrl}
           helperText={errors.websiteUrl}
         />
@@ -88,31 +121,71 @@ useEffect(() => {
         <RadioGroup
           row
           value={formValues.source}
-          onChange={(e) => handleChange('source', e.target.value)}
+          onChange={(e) => handleChange("source", e.target.value)}
         >
-          <FormControlLabel value="newsletter" control={<Radio />} label="メルマガ" />
+          <FormControlLabel
+            value="newsletter"
+            control={<Radio />}
+            label="メルマガ"
+          />
           <FormControlLabel value="line" control={<Radio />} label="LINE" />
-          <FormControlLabel value="x.com" control={<Radio />} label="twitter/x.com" />
-          <FormControlLabel value="facebook" control={<Radio />} label="facebook" />
-          <FormControlLabel value="instagram" control={<Radio />} label="Instagram" />
-          <FormControlLabel value="youtube" control={<Radio />} label="YouTube" />
-          <FormControlLabel value="qrcode" control={<Radio />} label="QRコード" />
+          <FormControlLabel
+            value="x.com"
+            control={<Radio />}
+            label="twitter/x.com"
+          />
+          <FormControlLabel
+            value="facebook"
+            control={<Radio />}
+            label="facebook"
+          />
+          <FormControlLabel
+            value="instagram"
+            control={<Radio />}
+            label="Instagram"
+          />
+          <FormControlLabel
+            value="youtube"
+            control={<Radio />}
+            label="YouTube"
+          />
+          <FormControlLabel
+            value="qrcode"
+            control={<Radio />}
+            label="QRコード"
+          />
           <FormControlLabel value="app" control={<Radio />} label="アプリ" />
-          <FormControlLabel value="message" control={<Radio />} label="ショートメール" />
+          <FormControlLabel
+            value="message"
+            control={<Radio />}
+            label="ショートメール"
+          />
           <FormControlLabel value="yahoo" control={<Radio />} label="ヤフー" />
           <FormControlLabel value="google" control={<Radio />} label="Google" />
-          <FormControlLabel value="ads" control={<Radio />} label="広告" />                 
-          <FormControlLabel value="signage" control={<Radio />} label="サイネージ" />
-          <FormControlLabel value="news" control={<Radio />} label="ニュースサイト" />
-          <FormControlLabel value="other_source" control={<Radio />} label="その他" />
+          <FormControlLabel value="ads" control={<Radio />} label="広告" />
+          <FormControlLabel
+            value="signage"
+            control={<Radio />}
+            label="サイネージ"
+          />
+          <FormControlLabel
+            value="news"
+            control={<Radio />}
+            label="ニュースサイト"
+          />
+          <FormControlLabel
+            value="other_source"
+            control={<Radio />}
+            label="その他"
+          />
         </RadioGroup>
-        {formValues.source === 'other_source' && (
+        {formValues.source === "other_source" && (
           <TextField
             variant="outlined"
             fullWidth
             margin="normal"
             value={formValues.sourceOther}
-            onChange={(e) => handleChange('sourceOther', e.target.value)}
+            onChange={(e) => handleChange("sourceOther", e.target.value)}
             placeholder="配信元を入力（英数小文字）"
             error={!!errors.sourceOther}
             helperText={errors.sourceOther}
@@ -131,29 +204,65 @@ useEffect(() => {
         <RadioGroup
           row
           value={formValues.medium}
-          onChange={(e) => handleChange('medium', e.target.value)}
+          onChange={(e) => handleChange("medium", e.target.value)}
         >
           <FormControlLabel value="email" control={<Radio />} label="メール" />
-          <FormControlLabel value="social" control={<Radio />} label="ソーシャルメディア" />
+          <FormControlLabel
+            value="social"
+            control={<Radio />}
+            label="ソーシャルメディア"
+          />
           <FormControlLabel value="video" control={<Radio />} label="動画" />
           <FormControlLabel value="maps" control={<Radio />} label="マップ" />
-          <FormControlLabel value="life" control={<Radio />} label="くらし情報" />
-          <FormControlLabel value="referral" control={<Radio />} label="メディア紹介" />
-          <FormControlLabel value="notification" control={<Radio />} label="スマホ通知" />
-          <FormControlLabel value="paid" control={<Radio />} label="その他広告" />
+          <FormControlLabel
+            value="life"
+            control={<Radio />}
+            label="くらし情報"
+          />
+          <FormControlLabel
+            value="referral"
+            control={<Radio />}
+            label="メディア紹介"
+          />
+          <FormControlLabel
+            value="notification"
+            control={<Radio />}
+            label="スマホ通知"
+          />
+          <FormControlLabel
+            value="paid"
+            control={<Radio />}
+            label="その他広告"
+          />
           <FormControlLabel value="sms" control={<Radio />} label="SMS" />
-          <FormControlLabel value="cpc" control={<Radio />} label="クリック型" />
-          <FormControlLabel value="cpv" control={<Radio />} label="広告視聴型" />
-          <FormControlLabel value="display" control={<Radio />} label="バナー" />
-          <FormControlLabel value="other_medium" control={<Radio />} label="その他" />
+          <FormControlLabel
+            value="cpc"
+            control={<Radio />}
+            label="クリック型"
+          />
+          <FormControlLabel
+            value="cpv"
+            control={<Radio />}
+            label="広告視聴型"
+          />
+          <FormControlLabel
+            value="display"
+            control={<Radio />}
+            label="バナー"
+          />
+          <FormControlLabel
+            value="other_medium"
+            control={<Radio />}
+            label="その他"
+          />
         </RadioGroup>
-        {formValues.medium === 'other_medium' && (
+        {formValues.medium === "other_medium" && (
           <TextField
             variant="outlined"
             fullWidth
             margin="normal"
             value={formValues.mediumOther}
-            onChange={(e) => handleChange('mediumOther', e.target.value)}
+            onChange={(e) => handleChange("mediumOther", e.target.value)}
             placeholder="メディア種別を入力（英数小文字）"
             error={!!errors.mediumOther}
             helperText={errors.mediumOther}
@@ -169,7 +278,7 @@ useEffect(() => {
         </Tooltip>
       </Box>
       <Box display="flex" gap={2}>
-        <LocalizationProvider dateAdapter={AdapterDateFns} locale={ja}>
+        <LocalizationProvider dateAdapter={CustomAdapterDateFns}>
           <DatePicker
             label="配信日から入力"
             value={formValues.deliveryDate}
@@ -193,7 +302,7 @@ useEffect(() => {
           fullWidth
           margin="normal"
           value={formValues.campaignName}
-          onChange={(e) => handleChange('campaignName', e.target.value)}
+          onChange={(e) => handleChange("campaignName", e.target.value)}
           error={!!errors.campaignName}
           helperText={errors.campaignName}
         />
@@ -212,7 +321,7 @@ useEffect(() => {
         fullWidth
         margin="normal"
         value={formValues.content}
-        onChange={(e) => handleChange('content', e.target.value)}
+        onChange={(e) => handleChange("content", e.target.value)}
         error={!!errors.content}
         helperText={errors.content}
       />
@@ -228,7 +337,7 @@ useEffect(() => {
           bgcolor="grey.100"
         >
           {showPreview ? (
-            <Typography variant="body1" style={{ overflowWrap: 'break-word' }}>
+            <Typography variant="body1" style={{ overflowWrap: "break-word" }}>
               {generatedUrl}
             </Typography>
           ) : (

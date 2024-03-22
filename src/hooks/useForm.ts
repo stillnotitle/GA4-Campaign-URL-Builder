@@ -30,8 +30,8 @@ const validateForm = (values: FormValues): Record<string, string> => {
 export const useForm = () => {
   const [formValues, setFormValues] = useState<FormValues>({
     websiteUrl: '',
-    source: '',
-    medium: '',
+    source: '' as FormValues['source'],
+    medium: '' as FormValues['medium'],
     campaignName: '',
     sourceOther: '',
     mediumOther: '',

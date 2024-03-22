@@ -278,7 +278,7 @@ const UrlGeneratorForm: React.FC<UrlGeneratorFormProps> = ({
         </Tooltip>
       </Box>
       <Box display="flex" gap={2}>
-        <LocalizationProvider dateAdapter={AdapterDateFns} locale={ja}>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DatePicker
             label="配信日から入力"
             value={formValues.deliveryDate}

@@ -12,17 +12,15 @@ function App() {
   const handleFormSubmit = (formValues: FormValues) => {
     console.log('Form submitted with values:', formValues);
     const errors = validateFormValues(formValues);
-
     if (Object.keys(errors).length > 0) {
       console.log('Validation errors:', errors);
       setValidationErrors(errors);
       return;
     }
-
     setValidationErrors({});
-    const generatedUrl = generateUrl(formValues);
-    console.log('Generated URL:', generatedUrl);
-    setGeneratedUrl(generatedUrl);
+    const url = generateUrl(formValues);
+    console.log('Generated URL:', url);
+    setGeneratedUrl(url);
   };
 
   return (
@@ -35,11 +33,9 @@ function App() {
           すべての*付きの必須項目を入力すると、GAで分析が出来るパラメーター付きURLがかんたんに生成できます。
         </Typography>
       </Box>
-
       <UrlGeneratorForm
         onSubmit={handleFormSubmit}
         validationErrors={validationErrors}
-        generatedUrl={generatedUrl}
       />
     </Container>
   );

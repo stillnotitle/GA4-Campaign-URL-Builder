@@ -1,24 +1,28 @@
 import { FormValues } from '../types';
 
-export const validateFormValues = (formValues: FormValues): string[] => {
-  const errors: string[] = [];
+interface ValidationErrors {
+  [key: string]: string;
+}
+
+export const validateFormValues = (formValues: FormValues): ValidationErrors => {
+  const errors: ValidationErrors = {};
 
   if (!formValues.websiteUrl) {
-    errors.push('ウェブサイトのURLを入力してください。');
+    errors.websiteUrl = 'ウェブサイトのURLを入力してください。';
   } else if (!isValidUrl(formValues.websiteUrl)) {
-    errors.push('有効なウェブサイトのURLを入力してください。');
+    errors.websiteUrl = '有効なウェブサイトのURLを入力してください。';
   }
 
   if (!formValues.campaignName) {
-    errors.push('キャンペーン名を入力してください。');
+    errors.campaignName = 'キャンペーン名を入力してください。';
   }
 
   if (formValues.source === 'other_source' && !formValues.sourceOther) {
-    errors.push('参照元を入力してください。');
+    errors.sourceOther = '参照元を入力してください。';
   }
 
   if (formValues.medium === 'other_medium' && !formValues.mediumOther) {
-    errors.push('メディアを入力してください。');
+    errors.mediumOther = 'メディアを入力してください。';
   }
 
   return errors;

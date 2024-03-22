@@ -27,7 +27,7 @@ function App() {
     <Container maxWidth="sm">
       <Box mt={4} mb={4}>
         <Typography variant="h4" component="h1" gutterBottom>
-          &#128221;GA4 URLジェネレーター
+          &#128221;GA4 キャンペーンURLビルダー
         </Typography>
         <Typography variant="body1" gutterBottom>
           すべての*付きの必須項目を入力すると、GAで分析が出来るパラメーター付きURLがかんたんに生成できます。
